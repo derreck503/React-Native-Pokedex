@@ -21,52 +21,87 @@ class Pokedex extends Component {
 
 constructor(props) {
     super(props);
+    
+    const items = pokedex.pokemon.filter((item) => {
+      return item.name.indexOf('') > -1
+    })
+
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
     this.state = {
-      dataSource: ds.cloneWithRows([
-        'John', 'Joel', 'James', 'Jimmy', 'Jackson', 'Jillian', 'Julie', 'Devin'
-      ])
+      dataSource: ds.cloneWithRows(items),
+      searchInput: ''
     };
+  }
+
+  filter() {
+    console.log(this)
+
+    const items = pokedex.pokemon.filter((item) => {
+      return item.name.indexOf(this.state.searchInput) > -1
+    })
+
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
+    this.setState({ dataSource: ds.cloneWithRows(items)})
+
   }
 
   render() {
     return (
       <View style={styles.container}>
-      <Image source={require('./pokedex.png')}/>
+        <Image source={require('./pokedex.png')}/>
 
-      <Text style={styles.welcome}>
-      Welcome to Derreck's Pokedex!
-      </Text>
+        <Text style={styles.welcome}>
+         Welcome to Derreck's Pokedex!
+        </Text>
 
-      <Image
-        style = {{width: 250, height: 250}}
-        source={{uri: pokedex.pokemon[0].img}}
-      />
-      <Text style={styles.instructions}>
-      To get started, type in a filter!
-      </Text>
+        <Text style={styles.instructions}>
+        To get started, type in a filter!
+        </Text>
 
-      <View style = {styles.container1}>
-      <TextInput style = {styles.searchInput} placeholder = '  Insert Text' />
-      <TouchableHighlight style = {styles.button} underlayColor = '#99d9f4'>
-      <Text style = {styles.buttonText}>Search</Text>
-      </TouchableHighlight>
-      </View>
+        <View style = {styles.container1}>
+          <TextInput 
+          style = {styles.searchInput} 
+          placeholder = '  Insert Text'
+          onChangeText={(text) => this.setState({searchInput: text })}
+          autoCorrect={false}
+          />
+          <TouchableHighlight style = {styles.button} underlayColor = '#4E98EA' onPress = {() => {this.filter()}}>
+            <Text style = {styles.buttonText}>Search</Text>
+          </TouchableHighlight>
+        </View>
   
-      <View style={styles.data}>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={(rowData) => <Text>{rowData}</Text>}
-        />
-      </View>
+        <View style={styles.data}>
+
+          <ListView
+            dataSource={this.state.dataSource}
+            style = {{flex: 1, alignSelf: 'stretch' }}
+            renderRow={(rowData) => {
+              return (
+              <View style = {styles.dataItem}>
+                <Text>{rowData.name}</Text>
+                <Text>{rowData.type.map((item) => {
+                  return item + ',';
+                })}
+                </Text>
+                <Image
+                  style = {{width: 100, height: 100}}
+                  source={{uri: rowData.img}}
+                />
+              </View>
+              )
+            }}
+          />
+        </View>
 
       </View>
 
 
 
-      );
+        );
+      }
     }
-  }
 
 
 
@@ -116,11 +151,11 @@ constructor(props) {
       flexDirection: 'row', 
     },
     data: {
-      paddingTop: 5,
-      paddingLeft: 5,
-      fontSize: 20,
-      alignSelf: 'flex-start',
-      margin: 0,
+      flex: 1,
+      flexDirection: 'column'
+    },
+    dataItem: {
+      flex: 0.3,
     }
   });
 
